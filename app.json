@@ -1,9 +1,9 @@
 {
-  "name": "Telegram Sweepstakes Detector",
-  "description": "Bot to detect and track sweepstakes and giveaways on Telegram groups and channels.",
-  "repository": "https://github.com/Mkpo1234/Hhhyu",
+  "name": "Telegram Sweepstakes Bot",
+  "description": "Bot to detect and track sweepstakes on Telegram channels and groups.",
+  "repository": "https://github.com/اسم_مستخدمك/اسم_المستودع",
   "logo": "https://telegram.org/img/t_logo.png",
-  "keywords": ["telegram", "bot", "telethon", "sweepstakes", "python"],
+  "keywords": ["telegram", "bot", "telethon", "python"],
   "env": {
     "API_ID": {
       "description": "Telegram API ID الخاص بك",
