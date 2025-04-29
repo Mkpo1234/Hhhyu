@@ -1,6 +1,8 @@
 import asyncio
 import csv
 import os
+from fastapi import FastAPI
+import uvicorn
 from telethon import TelegramClient, events, Button
 from telethon.sessions import StringSession
 from datetime import datetime, timedelta, timezone
@@ -50,7 +52,7 @@ async def send_alert(bot, chat_name, message_link, text_snippet, time_detected):
 
 # --------- إعداد تيليجرام ---------
 client = TelegramClient(StringSession(session_string), api_id, api_hash)
-bot = TelegramClient('bot_session', api_id, api_hash)
+bot = TelegramClient('bot_session', api_id, api_hash).start(bot_token=bot_token)
 
 async def fetch_old_messages(client, bot):
     print("[*] جاري فحص الرسائل القديمة...")
@@ -86,7 +88,6 @@ async def fetch_old_messages(client, bot):
             except Exception as e:
                 print(f"[!] خطأ أثناء قراءة {entity.id}: {e}")
 
-# --------- معالجات الأحداث ---------
 @client.on(events.NewMessage)
 async def handler(event):
     if event.is_group or event.is_channel:
@@ -112,75 +113,23 @@ async def handler(event):
             await send_alert(bot, chat_name, message_link or "بدون رابط", event.raw_text[:300], now)
             print(f"[NEW] مسابقة جديدة في {chat_name}")
 
-@bot.on(events.NewMessage(pattern='/start'))
-async def start(event):
-    sweepstakes = read_sweepstakes()
-    if not sweepstakes:
-        await event.respond("❗ لا توجد مسابقات مكتشفة حاليًا.", buttons=[Button.inline("🔄 تحديث", b"refresh")])
-        return
-    text = "📋 **قائمة المسابقات المكتشفة:**\n\n"
-    for idx, sweep in enumerate(sweepstakes, start=1):
-        name = sweep['القناة/المجموعة']
-        link = sweep['رابط الرسالة']
-        time = sweep['التاريخ']
-        if link != "لا يوجد":
-            text += f"🔹 {idx}. [{name}]({link}) — `{time}`\n"
-        else:
-            text += f"🔹 {idx}. {name} — `{time}`\n"
+# --------- إضافة سيرفر ويب ---------
+app = FastAPI()
 
-    await event.respond(
-        text,
-        link_preview=False,
-        buttons=[
-            [Button.inline("🗑️ حذف جميع المكتشفات", b"delete_all")],
-            [Button.inline("🔄 تحديث القائمة", b"refresh")]
-        ]
-    )
+@app.get("/")
+async def root():
+    return {"message": "The bot is running!"}
 
-@bot.on(events.CallbackQuery(data=b'delete_all'))
-async def delete_all_handler(event):
-    if os.path.exists(csv_file):
-        os.remove(csv_file)
-        await event.edit("✅ تم حذف جميع المسابقات المكتشفة بنجاح.")
-    else:
-        await event.edit("❗ لا يوجد شيء لحذفه.")
-
-@bot.on(events.CallbackQuery(data=b'refresh'))
-async def refresh_handler(event):
-    sweepstakes = read_sweepstakes()
-    if not sweepstakes:
-        await event.edit("❗ لا توجد مسابقات مكتشفة حاليًا.", buttons=[Button.inline("🔄 تحديث", b"refresh")])
-        return
-    text = "📋 **قائمة المسابقات المكتشفة:**\n\n"
-    for idx, sweep in enumerate(sweepstakes, start=1):
-        name = sweep['القناة/المجموعة']
-        link = sweep['رابط الرسالة']
-        time = sweep['التاريخ']
-        if link != "لا يوجد":
-            text += f"🔹 {idx}. [{name}]({link}) — `{time}`\n"
-        else:
-            text += f"🔹 {idx}. {name} — `{time}`\n"
-
-    await event.edit(
-        text,
-        link_preview=False,
-        buttons=[
-            [Button.inline("🗑️ حذف جميع المكتشفات", b"delete_all")],
-            [Button.inline("🔄 تحديث القائمة", b"refresh")]
-        ]
-    )
-
-# --------- التشغيل الرئيسي ---------
 async def main():
     print(">> بدء تشغيل البوت...")
     await client.start()
-    await bot.start(bot_token=bot_token)
     await fetch_old_messages(client, bot)
-    print("[*] جاهز للاستقبال...")
-    await asyncio.gather(
-        client.run_until_disconnected(),
-        bot.run_until_disconnected()
-    )
+    await client.run_until_disconnected()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    loop = asyncio.get_event_loop()
+    loop.create_task(main())
+
+    # نأخذ المتغير PORT الذي تطلبه Render
+    port = int(os.getenv("PORT", 10000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
