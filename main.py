@@ -50,7 +50,7 @@ async def send_alert(bot, chat_name, message_link, text_snippet, time_detected):
 
 # --------- إعداد تيليجرام ---------
 client = TelegramClient(StringSession(session_string), api_id, api_hash)
-bot = TelegramClient('bot_session', api_id, api_hash).start(bot_token=bot_token)
+bot = TelegramClient('bot_session', api_id, api_hash)
 
 async def fetch_old_messages(client, bot):
     print("[*] جاري فحص الرسائل القديمة...")
@@ -86,6 +86,7 @@ async def fetch_old_messages(client, bot):
             except Exception as e:
                 print(f"[!] خطأ أثناء قراءة {entity.id}: {e}")
 
+# --------- معالجات الأحداث ---------
 @client.on(events.NewMessage)
 async def handler(event):
     if event.is_group or event.is_channel:
@@ -169,12 +170,17 @@ async def refresh_handler(event):
         ]
     )
 
-def main():
+# --------- التشغيل الرئيسي ---------
+async def main():
     print(">> بدء تشغيل البوت...")
-    client.start()
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(fetch_old_messages(client, bot))
-    client.run_until_disconnected()
+    await client.start()
+    await bot.start(bot_token=bot_token)
+    await fetch_old_messages(client, bot)
+    print("[*] جاهز للاستقبال...")
+    await asyncio.gather(
+        client.run_until_disconnected(),
+        bot.run_until_disconnected()
+    )
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
