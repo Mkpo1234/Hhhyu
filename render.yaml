@@ -2,10 +2,7 @@ services:
   - type: web
     name: telegram-bot
     env: python
-    repo: https://github.com/اسم_مستودعك_هنا
+    plan: free
     branch: main
-    buildCommand: pip install -r requirements.txt
+    buildCommand: ""
     startCommand: python main.py
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.10
