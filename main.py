@@ -10,7 +10,7 @@ api_id = 23398930          # << ضع هنا API ID الخاص بك
 api_hash = 'bd3e85a7aae40566f2fa8804d200d6d0'  # << ضع هنا API HASH الخاص بك
 
 session_string = "1BJWap1sBu1wuLC0UJm6sAOZMJMt4F7lFf37wp6Klen082u0dA3Vmn0U978Y3TjUu_dGWw5OctvHhYG8Wk3X-8EEXxnnjojVqMiYwie3AD462svUjaNdYxOV-tzsAhJ9nJuvCvUGO4RkHyBi6zmw6tI_eV9KsN8w_qi403gm-tRgOsSUQkUNWGv4UDeeLP4CWsobd4Z_JZq_wt-RsCbGmszGEWtkHodeiuT3LfVpMCAgRYpFhQgQK89q8wu1zNqx2e8xuDkUx5bn03jVl08EtBDwMVAog2BIsMZcSg1Q_JLJvZ0eHKlIFH6Q_wVMEI8y7o6tK1xg1jymZVNsKCyWVbJ8_a0I5PBg="  # << ضع هنا كود الجلسة
-bot_token = '7972559567:AAGEjYo766OA-rOE4F5lqaJLdu5dff16ivA'  # << توكن البوت الخاص بك
+bot_token = '7972559567:AAGzN2IjK76mBFB276SbFMosUjfa58EXJIM'  # << توكن البوت الخاص بك
 your_channel_username = '@Gift640'  # << اسم قناتك مع @
 
 csv_file = 'sweepstakes_log.csv'
